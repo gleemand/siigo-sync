@@ -1,0 +1,52 @@
+<?php
+
+// siigo accounts
+$sites = [
+    'siigo' => [
+        'crm' => [
+            'url' => 'https://url.retailcrm.es/',
+            'api_key' => 'api_key',
+        ],
+        'siigo' => [
+            'username' => 'user@mail.mail',
+            'access_key' => 'access_key',
+        ],
+
+        //code of shop (CRM) for exporting orders from Siigo
+        'crm_store_code' => 'siigo',
+
+        //invoice settings
+        'invoices' => [
+            //'currency' => [
+            //    'code' => 'COP',
+            //    'exchange_rate' => 3746.00,
+            //],
+        ],
+
+        //CRM seller id => Siigo seller id
+        'sellers' => [
+            'default' => '1234',
+            '1' => '12345',
+        ],
+
+        //code of customer custom field contains DNI in CRM
+        'dni_custom_field' => 'dni',
+
+        //trigger for upload order to Siigo ('status', 'group', 'full_paid')
+        'trigger' => 'status',
+
+            //code of status that triggers to upload order to Siigo
+            'status' => 'complete',
+
+            //code of groups of statuses that triggers to upload order to Siigo
+            'groups_of_status' => [
+                '',
+            ],
+
+        //code of delivery item in Siigo (delivery will deduct if empty)
+        'delivery_item_code' => '',
+
+            //id of tax 0% in Siigo for delivery item
+            'tax_id_for_delivery' => '',
+    ],
+];
