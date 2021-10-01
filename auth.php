@@ -1,6 +1,6 @@
 <?php
 
-echo "\n- getting new auth token for ".$site."\n";
+$logger->info('- getting new auth token for ' . $site);
 
 
 $client = new \GuzzleHttp\Client([
@@ -27,16 +27,18 @@ try {
     $result = json_decode($response->getBody()->getContents(), true);
 
 } catch (\Exception $e) {
-    echo '✗ '.$e->getMessage()."\n"; die();
+    $logger->error('✗ ' . $e->getMessage());
+    die();
 }
 
 
 $accessToken = null;
 if (isset($result['access_token']) && !empty($result['access_token'])) {
     $accessToken = $result['access_token'];
-    echo "✓ access token obtained for ".$site."\n";
+    $logger->error('✓ access token obtained for ' . $site);
 } else {
-    echo "✗ there is no access token for ".$site."\n"; die();
+    $logger->error('✗ there is no access token for ' . $site);
+    die();
 }
 
 $headers = [
