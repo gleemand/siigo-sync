@@ -35,7 +35,7 @@ try {
 $accessToken = null;
 if (isset($result['access_token']) && !empty($result['access_token'])) {
     $accessToken = $result['access_token'];
-    $logger->error('✓ access token obtained for ' . $site);
+    $logger->info('✓ access token obtained for ' . $site);
 } else {
     $logger->error('✗ there is no access token for ' . $site);
     die();
