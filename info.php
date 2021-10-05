@@ -43,7 +43,7 @@ foreach ($sites as $site => $config) {
 echo html('begin');
 
 // Payments
-$payments = getDataFromSiigo('https://api.siigo.com/v1/document-types?type=FV');
+$payments = getDataFromSiigo('https://api.siigo.com/v1/payment-types?document_type=FV');
 
 displayHtml('Formas de Pago', $payments);
 
