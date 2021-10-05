@@ -89,10 +89,12 @@ function displayHtml($titleData, $data)
     if ($titleData == 'Formas de Pago') {
         echo '<p>Copy "ID" to "Description" field of appropriate payment method at CRM <a target="_blank" href="'
         . $simlaUrl
-        . 'admin/payment-types">here</a>.</p>';
+        . 'admin/payment-types">here</a>.</p>'
+        . '<p><b>Don`t forget to activate payment method in Siigo if you want to use it!</b></p>';
     }
+
     echo $titleData != 'Usuarios'
-        ? "<thead><tr>" . "<td>ID" . "<td>Name" . "</tr></thead>"
+        ? "<thead><tr>" . "<td>ID" . "<td>Name" . "<td>Active" . "</tr></thead>"
         : "<thead><tr>" . "<td>ID" . "<td>User" . "<td>Active" . "</tr></thead>";
 
     foreach ($data as $value) {
@@ -109,6 +111,7 @@ function displayHtml($titleData, $data)
             echo "<td>{$value['active']}</td>";
         } else {
             echo "<td>{$value['name']}</td>";
+            echo "<td>{$value['active']}</td>";
         }
 
         echo "</tr>";

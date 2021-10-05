@@ -185,6 +185,9 @@ foreach ($ordersHistory as $change) {
         $taxes = null;
 
         if (isset($item['vatRate']) && $item['vatRate']) {
+            if ($item['vatRate'] == 'none') {
+                $item['vatRate'] = 0;
+            }
             $price = round($price / (1 + $item['vatRate'] / 100), 4);
             $taxes = [['id' => findTaxId($item['vatRate'])]];
             $retentions = array_merge($retentions, $taxes);
@@ -246,13 +249,14 @@ foreach ($ordersHistory as $change) {
 
     //seller
     if (
-        isset($config['sellers'][$order['managerId'])
-        && $order['orderMethod'] = 'phone';
-        && empty($order['externalId']);
+        isset($order['managerId'])
+        && isset($config['sellers'][$order['managerId']])
+        && $order['orderMethod'] = 'phone'
+        && empty($order['externalId'])
     ) {
         $seller = $config['sellers'][$order['managerId']];
     } else {
-        $seller = $config['sellers']['default']);
+        $seller = $config['sellers']['default'];
     }
 
     $post = [
