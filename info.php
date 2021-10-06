@@ -83,6 +83,8 @@ function getDataFromSiigo($request)
 
 function displayHtml($titleData, $data)
 {
+    global $simlaUrl;
+
     echo "<h3>$titleData: </h3>";
     echo "<table class='styled-table' border style='border-collapse:collapse; width:500px; text-align:center'>";
 
