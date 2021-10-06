@@ -54,7 +54,7 @@ if ($invoceUpdated) {
     // to do: check update invoices
     //$url .= '?updated_start=' . $invoceUpdated;
 
-    $logger->info('✓ load from date ' . $invoceUpdated);
+    $logger->info('✓ load from date ' . $invoceUpdated . ' (Bogota time)');
 }
 
 // stored data
@@ -242,6 +242,7 @@ if ($siigoInvoices) {
             'source' => ['source' => 'Siigo'],
             'customFields' => [
                 'siigo_id' => $invoice['id'],
+                'dni' => $customer['identification'],
             ],
         ];
 
@@ -287,7 +288,7 @@ if ($siigoInvoices) {
             }
 
         } catch (\RetailCrm\Exception\CurlException $e) {
-            $logger->error('✗ connection error: ' . $e->getMessage();
+            $logger->error('✗ connection error: ' . $e->getMessage());
             continue;
         }
     }

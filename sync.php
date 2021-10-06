@@ -94,9 +94,12 @@ foreach ($sites as $site => $config) {
     }
     if ($resetHist) {
         $siigoInvoicesUpdatedFile = dirname(__FILE__) . '/siigo/' . $site . '_last_invoice_updated';
+        $siigoCustomersUpdatedFile = dirname(__FILE__) . '/siigo/'.$site.'_last_customer_updated';
 
-        $now = new \DateTime('now', new DateTimeZone('America/Bogota'));
-        file_put_contents($siigoInvoicesUpdatedFile, $now->format('Y-m-d\TH:i:s.v\Z'));
+        $nowOrders = new \DateTime('now', new DateTimeZone('America/Bogota'));
+        $nowCustomers = new \DateTime('now', new DateTimeZone('UTC'));
+        file_put_contents($siigoInvoicesUpdatedFile, $nowOrders->format('Y-m-d\TH:i:s.v\Z'));
+        file_put_contents($siigoCustomersUpdatedFile, $nowCustomers->format('Y-m-d\TH:i:s.v\Z'));
     }
 
     if ($resetCrmHist) {

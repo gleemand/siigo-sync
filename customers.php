@@ -18,7 +18,7 @@ $url = 'https://api.siigo.com/v1/customers';
 if ($customerUpdated) {
 
     $url .= '?created_start=' . $customerUpdated;
-    $logger->info('✓ load from date ' . $customerUpdated);
+    $logger->info('✓ load from date ' . $customerUpdated . ' (UTC time)');
 }
 
 do {
