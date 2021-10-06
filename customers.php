@@ -193,7 +193,7 @@ if ($siigoCustomers) {
             }
 
         } catch (\RetailCrm\Exception\CurlException $e) {
-            $logger->error('✗ connection error: ' . $e->getMessage();
+            $logger->error('✗ connection error: ' . $e->getMessage());
             continue;
         }
     }

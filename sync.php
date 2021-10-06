@@ -17,7 +17,7 @@ $logger->pushHandler($handler);
 $logger->info('--------------------------------------------------------');
 
 // arguments
-$loadIcml = $loadStocks = $loadCustomers = $loadOrders = false;
+$loadIcml = $loadStocks = $loadCustomers = $loadOrders = $resetHist = false;
 $resetCrmHist = $loadCrmCustomers = $loadCrmOrders = false;
 foreach ($argv as $arg) {
 
@@ -32,6 +32,9 @@ foreach ($argv as $arg) {
     }
     if ($arg == 'orders') {
         $loadOrders = true;
+    }
+    if ($arg == 'hist_reset') {
+        $resetHist = true;
     }
 
     if ($arg == 'crm_hist_reset') {
@@ -88,6 +91,12 @@ foreach ($sites as $site => $config) {
     }
     if ($loadOrders) {
         include dirname(__FILE__) . '/orders.php';
+    }
+    if ($resetHist) {
+        $siigoInvoicesUpdatedFile = dirname(__FILE__) . '/siigo/' . $site . '_last_invoice_updated';
+
+        $now = new \DateTime('now', new DateTimeZone('America/Bogota'));
+        file_put_contents($siigoInvoicesUpdatedFile, $now->format('Y-m-d\TH:i:s.v\Z'));
     }
 
     if ($resetCrmHist) {

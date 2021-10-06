@@ -26,7 +26,9 @@ try {
     $response = $api->request->paymentTypesList();
     if ($response->isSuccessful()) {
         foreach ($response['paymentTypes'] as $paymentType) {
-            $crmPaymentTypes[$paymentType['code']] = $paymentType;
+            if (isset($paymentType['description'])) {
+                $crmPaymentTypes[$paymentType['description']] = $paymentType;
+            }
         }
     }
 } catch (\RetailCrm\Exception\CurlException $e) {
@@ -39,7 +41,7 @@ try {
 $siigoInvoices = [];
 
 $invoceUpdated = null;
-$siigoInvoicesUpdatedFile = dirname(__FILE__) . '/siigo/'.$site.'_last_invoice_updated';
+$siigoInvoicesUpdatedFile = dirname(__FILE__) . '/siigo/' . $site . '_last_invoice_updated';
 if (file_exists($siigoInvoicesUpdatedFile)) {
     $invoceUpdated = file_get_contents($siigoInvoicesUpdatedFile);
 }

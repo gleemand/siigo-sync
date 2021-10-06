@@ -423,9 +423,9 @@ function createPaymentTypeInCRM($paymentMethod) {
 
     $paymentType = [
         'name' => $paymentMethod['name'],
-        'code' => 'siigo-'.$paymentMethod['id'],
+        'code' => 'siigo-' . $paymentMethod['id'],
         'active' => true,
-        'description' => 'Siigo type '.$paymentMethod['type'],
+        'description' => 'siigo-' . $paymentMethod['id'],
         'paymentStatuses' => $crmPaymentStatuses,
     ];
 
