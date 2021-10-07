@@ -242,7 +242,7 @@ if ($siigoInvoices) {
             'source' => ['source' => 'Siigo'],
             'customFields' => [
                 'siigo_id' => $invoice['id'],
-                'dni' => $customer['identification'],
+                'dni' => $customer['customFields'][$config['dni_custom_field']],
             ],
         ];
 
