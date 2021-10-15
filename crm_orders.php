@@ -90,6 +90,10 @@ foreach ($result as $item) {
 function findTaxId($percentage) {
     global $siigoTaxes;
 
+    if ($percentage == 'none') {
+        $percentage = 0;
+    }
+
     foreach ($siigoTaxes as $id => $tax) {
         if ($tax['percentage'] == $percentage && $tax['active']) {
             return $tax['id'];
