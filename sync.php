@@ -8,6 +8,10 @@ require_once dirname(__FILE__) . '/vendor/autoload.php';
 require_once dirname(__FILE__) . '/config.php';
 require_once dirname(__FILE__) . '/functions.php';
 
+if (is_dir(dirname(__FILE__) . '/logs')) {
+    mkdir(dirname(__FILE__) . '/logs');
+}
+
 $logger = new Logger('Log');
 $handler = new RotatingFileHandler(__DIR__ . '/logs/log.log', 30,  Logger::DEBUG);
 $formatter = new LineFormatter(null, null, false, true);
@@ -80,19 +84,38 @@ foreach ($sites as $site => $config) {
     include dirname(__FILE__) . '/auth.php';
 
     if ($loadIcml) {
+        if (is_dir(dirname(__FILE__) . '/icml')) {
+            mkdir(dirname(__FILE__) . '/icml');
+        }
+
         include dirname(__FILE__) . '/icml.php';
     }
+
     if ($loadStocks) {
         include dirname(__FILE__) . '/stocks.php';
     }
 
     if ($loadCustomers) {
+        if (is_dir(dirname(__FILE__) . '/siigo')) {
+            mkdir(dirname(__FILE__) . '/siigo');
+        }
+
         include dirname(__FILE__) . '/customers.php';
     }
+
     if ($loadOrders) {
+        if (is_dir(dirname(__FILE__) . '/siigo')) {
+            mkdir(dirname(__FILE__) . '/siigo');
+        }
+
         include dirname(__FILE__) . '/orders.php';
     }
+
     if ($resetHist) {
+        if (is_dir(dirname(__FILE__) . '/siigo')) {
+            mkdir(dirname(__FILE__) . '/siigo');
+        }
+
         $siigoInvoicesUpdatedFile = dirname(__FILE__) . '/siigo/' . $site . '_last_invoice_updated';
         $siigoCustomersUpdatedFile = dirname(__FILE__) . '/siigo/'.$site.'_last_customer_updated';
 
@@ -103,12 +126,26 @@ foreach ($sites as $site => $config) {
     }
 
     if ($resetCrmHist) {
+        if (is_dir(dirname(__FILE__) . '/crm')) {
+            mkdir(dirname(__FILE__) . '/crm');
+        }
+
         include dirname(__FILE__) . '/crm_hist_reset.php';
     }
+
     if ($loadCrmCustomers) {
+        if (is_dir(dirname(__FILE__) . '/crm')) {
+            mkdir(dirname(__FILE__) . '/crm');
+        }
+
         include dirname(__FILE__) . '/crm_customers.php';
     }
+
     if ($loadCrmOrders) {
+        if (is_dir(dirname(__FILE__) . '/crm')) {
+            mkdir(dirname(__FILE__) . '/crm');
+        }
+
         include dirname(__FILE__) . '/crm_orders.php';
     }
 

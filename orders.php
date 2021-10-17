@@ -42,13 +42,14 @@ $siigoInvoices = [];
 
 $invoceUpdated = null;
 $siigoInvoicesUpdatedFile = dirname(__FILE__) . '/siigo/' . $site . '_last_invoice_updated';
+
 if (file_exists($siigoInvoicesUpdatedFile)) {
     $invoceUpdated = file_get_contents($siigoInvoicesUpdatedFile);
 }
 
 $url = 'https://api.siigo.com/v1/invoices';
-if ($invoceUpdated) {
 
+if ($invoceUpdated) {
     $url .= '?created_start=' . $invoceUpdated;
 
     // to do: check update invoices
@@ -118,35 +119,54 @@ if ($siigoInvoices) {
         }
 
         $contact = [];
+
         if (isset($customer['contacts']) && $customer['contacts']) {
             $contact = current($customer['contacts']);
         }
 
         $address = [];
-        if (isset($customer['address']['city']['country_code']) && $customer['address']['city']['country_code']) {
+
+        if (
+            isset($customer['address']['city']['country_code'])
+            && $customer['address']['city']['country_code']
+        ) {
             $address['countryIso'] = mb_strtoupper($customer['address']['city']['country_code']);
         }
-        if (isset($customer['address']['city']['state_name']) && $customer['address']['city']['state_name']) {
+
+        if (
+            isset($customer['address']['city']['state_name'])
+            && $customer['address']['city']['state_name']
+        ) {
             $address['region'] = $customer['address']['city']['state_name'];
         }
-        if (isset($customer['address']['city']['city_name']) && $customer['address']['city']['city_name']) {
+
+        if (
+            isset($customer['address']['city']['city_name'])
+            && $customer['address']['city']['city_name']
+        ) {
             $address['city'] = $customer['address']['city']['city_name'];
         }
-        if (isset($customer['address']['address']) && $customer['address']['address']) {
+
+        if (
+            isset($customer['address']['address'])
+            && $customer['address']['address']
+        ) {
             $address['text'] = $customer['address']['address'];
         }
 
         $phone = null;
+
         if (isset($customer['phones']) && $customer['phones']) {
             $curPhone = current($customer['phones']);
+
             if (isset($curPhone['number']) && $curPhone['number']) {
                 $phone = (isset($curPhone['indicative']) && $curPhone['indicative'] ? $curPhone['indicative'] : '') . $curPhone['number'];
             }
         }
 
         $items = [];
-        foreach ($invoice['items'] as $i => $item) {
 
+        foreach ($invoice['items'] as $i => $item) {
             $initialPrice = round($item['total'] / $item['quantity'], 2);
 
             /*$discountManualAmount = $discountManualPercent = null;
@@ -194,6 +214,7 @@ if ($siigoInvoices) {
 
             $paimentId = $invoice['id'] . '_' . $pi;
             $pCreatedAt = getDateFromStr($payment['due_date'] ?? null);
+
             if (!array_key_exists('siigo-' . $payment['id'], $crmPaymentTypes)) {
                 createPaymentTypeInCRM($paymentMethods[$payment['id']]);
             }
@@ -209,7 +230,12 @@ if ($siigoInvoices) {
         }
 
         $email = null;
-        if (isset($contact['email']) && $contact['email'] && preg_match($emailPattern, $contact['email'])) {
+
+        if (
+            isset($contact['email'])
+            && $contact['email']
+            && preg_match($emailPattern, $contact['email'])
+        ) {
             $email = $contact['email'];
         }
 
@@ -263,6 +289,7 @@ if ($siigoInvoices) {
 
                 // update
                 $response = $api->request->ordersEdit($order, 'externalId', $site);
+
                 if ($response->isSuccessful()) {
                     $logger->info('✓ order ' . $invoice['id'] . ' was updated in ' . $site);
                 } else {
@@ -277,6 +304,7 @@ if ($siigoInvoices) {
                 // create
                 usleep(1000000);
                 $response = $api->request->ordersCreate($order, $site);
+
                 if ($response->isSuccessful()) {
                     $logger->info('✓ order ' . $invoice['id'] . ' was created in ' . $site);
                 } else {

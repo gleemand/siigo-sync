@@ -2,10 +2,12 @@
 
 $logger->info("- load order history from CRM");
 
-$lastOrderHistFile = dirname(__FILE__) . '/crm/'.$site.'_last_order_history';
+$lastOrderHistFile = dirname(__FILE__) . '/crm/' . $site . '_last_order_history';
+
 if (file_exists($lastOrderHistFile)) {
     $ordSinceId = file_get_contents($lastOrderHistFile);
 }
+
 if ($ordSinceId) {
     $logger->info("✓ load from sinceId " . $ordSinceId);
 }
