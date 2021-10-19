@@ -13,7 +13,7 @@ $formatter = new LineFormatter(null, null, false, true);
 $handler->setFormatter($formatter);
 $logger->pushHandler($handler);
 
-$logger->info('-------------------------Display info-------------------------------');
+$logger->info('----------------Display info----------------');
 
 // choose accounts to load from args
 $loadAccounts = [];
@@ -45,7 +45,12 @@ echo html('begin');
 // Payments
 $payments = getDataFromSiigo('https://api.siigo.com/v1/payment-types?document_type=FV');
 
-displayHtml('Formas de Pago', $payments);
+displayHtml('Formas de Pago (payments)', $payments);
+
+// Warehouses
+$warehouses = getDataFromSiigo('https://api.siigo.com/v1/warehouses');
+
+displayHtml('Bodegas (warehouses)', $warehouses);
 
 // Taxes
 $taxes = getDataFromSiigo('https://api.siigo.com/v1/taxes');
@@ -55,12 +60,12 @@ displayHtml('Impuestos (taxes)', $taxes);
 // Users
 $users = getDataFromSiigo('https://api.siigo.com/v1/users');
 
-displayHtml('Usuarios', $users['results']);
+displayHtml('Usuarios (users)', $users['results']);
 
 // Centros de Costo
 $costs = getDataFromSiigo('https://api.siigo.com/v1/cost-centers');
 
-displayHtml('Centros de Costo', $costs);
+displayHtml('Centros de Costo (cost centers)', $costs);
 
 echo html('end');
 
@@ -85,7 +90,9 @@ function displayHtml($titleData, $data)
 {
     global $simlaUrl;
 
-    echo "<h3>$titleData: </h3>";
+    echo "<div class='filter'><details>";
+    echo "<summary>$titleData</summary>";
+    echo "<br>";
     echo "<table class='styled-table' border style='border-collapse:collapse; width:500px; text-align:center'>";
 
     if ($titleData == 'Formas de Pago') {
@@ -120,6 +127,7 @@ function displayHtml($titleData, $data)
     }
 
     echo "</table>";
+    echo "</details></div>";
 }
 
 function html($place)
@@ -140,6 +148,16 @@ function html($place)
                             h3 {
                                 font-size: 1.2em;
                             }
+                            div {
+                                margin-bottom: 20px;
+                            }
+                            .filter summary {
+                                font-weight: 700;
+                                cursor: pointer;
+                            }
+                            .filter summary:hover {
+                                color: #009879;
+                            }
                             .styled-table {
                                 border-collapse: collapse;
                                 font-size: 0.9em;
@@ -148,6 +166,7 @@ function html($place)
                                 box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
                                 margin-left: auto;
                                 margin-right: auto;
+                                margin-top: 15px;
                             }
                             .styled-table thead tr {
                                 background-color: #009879;
@@ -170,6 +189,9 @@ function html($place)
                                 border-bottom: 2px solid #009879;
                             }
                         </style>
+                        <title>
+                            Simla <-> Siigo
+                        </title>
                     </head>
                     <body>
                         <h3>Data provided by Siigo</h3>
