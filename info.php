@@ -95,27 +95,27 @@ function displayHtml($titleData, $data)
     echo "<br>";
     echo "<table class='styled-table' border style='border-collapse:collapse; width:500px; text-align:center'>";
 
-    if ($titleData == 'Formas de Pago') {
+    if ($titleData == 'Formas de Pago (payments)') {
         echo '<p>Copy "ID" to "Description" field of appropriate payment method at CRM <a target="_blank" href="'
         . $simlaUrl
         . 'admin/payment-types">here</a>.</p>'
         . '<p><b>Don`t forget to activate payment method in Siigo if you want to use it!</b></p>';
     }
 
-    echo $titleData != 'Usuarios'
+    echo $titleData != 'Usuarios (users)'
         ? "<thead><tr>" . "<td>ID" . "<td>Name" . "<td>Active" . "</tr></thead>"
         : "<thead><tr>" . "<td>ID" . "<td>User" . "<td>Active" . "</tr></thead>";
 
     foreach ($data as $value) {
         echo "<tr>";
 
-        if ($titleData == 'Formas de Pago') {
+        if ($titleData == 'Formas de Pago (payments)') {
             echo "<td>siigo-{$value['id']}</td>";
         } else {
             echo "<td>{$value['id']}</td>";
         }
 
-        if ($titleData == 'Usuarios') {
+        if ($titleData == 'Usuarios (users)') {
             echo "<td>{$value['identification']}</td>";
             echo "<td>{$value['active']}</td>";
         } else {

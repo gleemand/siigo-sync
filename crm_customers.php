@@ -34,7 +34,7 @@ try {
             break;
         }
 
-        if ($page%10 == 0) {
+        if ($page%5 == 0) {
             sleep(2);
         }
     }
@@ -52,6 +52,7 @@ foreach ($customers as $customer) {
         continue;
     }
 
+    usleep(500000);
     // get full and up to date customer
     $response = $api->request->customersGet($customer['id'], 'id', $customer['site']);
     if ($response->isSuccessful() && $response['customer']) {
@@ -67,8 +68,20 @@ foreach ($customers as $customer) {
         continue;
     }
 
-    if (!isset($customer['customFields'][$config['dni_custom_field']]) || empty($customer['customFields'][$config['dni_custom_field']])) {
-        $logger->warning("- customer ".$customer['id']." doesn't have cedula (identification number) - skipping ...");
+    if (
+        !isset($customer['customFields'][$config['dni_custom_field']])
+        || empty($customer['customFields'][$config['dni_custom_field']])
+    ) {
+        $logger->warning("- customer " . $customer['id'] . " doesn't have identification - skipping ...");
+
+        $upd = [
+            'id' => $customer['id'],
+            'customFields' => [
+                'siigo_last_error' => "The customer doesn't have identification",
+            ],
+        ];
+        $response = $api->request->customersEdit($upd, 'id', $customer['site']);
+
         continue;
     }
 
@@ -84,10 +97,11 @@ foreach ($customers as $customer) {
     }
 
     $address = [
-        'city' => $customer['address']['city'],
-        'region' => $customer['address']['region'],
-        'countryCode' => $customer['address']['countryIso'],
+        'city' => isset($customer['address']['city']) ? $customer['address']['city'] : null,
+        'region' => isset($customer['address']['region']) ? $customer['address']['region'] : null,
+        'countryCode' => isset($customer['address']['countryIso']) ? $customer['address']['countryIso'] : null,
     ];
+
     $addressCodes = prepareCustomerAddress($address);
 
 
@@ -95,11 +109,11 @@ foreach ($customers as $customer) {
         'type' => 'Customer',
         'person_type' => 'Person',
         'id_type' => '13',                       // Cédula de ciudadanía
-        'identification' => $customer['customFields'][$config['dni_custom_field']],
+        'identification' => str_replace([',', '.', '-', ' '], '', $customer['customFields'][$config['dni_custom_field']]),
         //'check_digit' => '4',                  // Digito verificación (Si el tipo de identificación es NIT se calcula)
         'name' => [
-            $customer['firstName'],
-            $customer['lastName'],
+            isset($customer['firstName']) ? $customer['firstName'] : null,
+            isset($customer['lastName']) ? $customer['lastName'] : null,
         ],
         //'commercial_name' => '',
         //'branch_office' => 0,                  // Sucursal
@@ -111,12 +125,12 @@ foreach ($customers as $customer) {
         'address' => [
             'address' => isset($customer['address']['text']) ? $customer['address']['text'] : null,
             'city' => $addressCodes,
-            "postal_code" => isset($customer['address']['index']) ? $customer['address']['index'] : null,
+            "postal_code" => isset($customer['address']['index']) ? substr($customer['address']['index'], 0, 10) : null,
         ],
         'phones' => $phones,
         'contacts' => [[
-            'first_name' => $customer['firstName'],
-            'last_name' => $customer['lastName'],
+            'first_name' => isset($customer['firstName']) ? $customer['firstName'] : null,
+            'last_name' => isset($customer['lastName']) ? $customer['lastName'] : null,
             'email' => $customer['email'],
             'phone' => $phones ? current($phones) : null,
         ]],
@@ -147,12 +161,12 @@ foreach ($customers as $customer) {
 
     // error
     if (isset($result['Errors'])) {
-        $logger->error(json_encode($post));
+        $logger->error('Customer: ' . $customer['email'] . ' - ' . $post['identification']);
 
         $errors = [];
         foreach ($result['Errors'] as $error) {
             $errors[] = $error['Message'] . " (" . $error['Code'] . ")";
-            $logger->error(json_encode($error));
+            $logger->error($error['Message'] . " (" . $error['Code'] . ")");
         }
 
         // set siigo last error

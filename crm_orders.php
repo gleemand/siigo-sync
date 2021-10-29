@@ -36,7 +36,7 @@ try {
             break;
         }
 
-        if ($page%10 == 0) {
+        if ($page%5 == 0) {
             sleep(2);
         }
     }
@@ -154,6 +154,7 @@ foreach ($ordersHistory as $change) {
         continue;
     }
 
+    usleep(500000);
     // get full and up to date order
     $response = $api->request->ordersGet($change['order']['id'], 'id', $change['order']['site']);
     if ($response->isSuccessful() && $response['order']) {
@@ -171,11 +172,24 @@ foreach ($ordersHistory as $change) {
     $siigoTypesOfDoc = current($siigoTypesOfDocs);
 
     // checks
-    if (!isset($order['customer']['customFields'][$config['dni_custom_field']]) || empty($order['customer']['customFields'][$config['dni_custom_field']])) {
-        $logger->warning("- customer of order " . $order['id'] . " doesn't have cedula (identification number) - skipping ...");
+    if (
+        !isset($order['customer']['customFields'][$config['dni_custom_field']])
+        || empty($order['customer']['customFields'][$config['dni_custom_field']])
+    ) {
+        $logger->warning("- customer of order " . $order['id'] . " doesn't have identification - skipping ...");
+
+        $upd = [
+            'id' => $order['id'],
+            'customFields' => [
+                'siigo_last_error' => "The customer doesn't have identification",
+            ],
+        ];
+        $response = $api->request->ordersEdit($upd, 'id', $order['site']);
+
         continue;
     }
 
+    //$createdAt = getDateFromStr($order['fullPaidAt'], 'America/Bogota');
     $createdAt = getDateFromStr($order['createdAt'], 'America/Bogota');
 
     $items = [];
@@ -194,7 +208,8 @@ foreach ($ordersHistory as $change) {
             if ($item['vatRate'] == 'none') {
                 $item['vatRate'] = 0;
             }
-            $price = round($price / (1 + $item['vatRate'] / 100), 4);
+
+            $price = round($price / (1 + $item['vatRate'] / 100), 5);
             $taxes = [['id' => findTaxId($item['vatRate'])]];
             $retentions = array_merge($retentions, $taxes);
         }
@@ -206,6 +221,7 @@ foreach ($ordersHistory as $change) {
             'price' => $price,
             //'discount' => '', // in percent
             'taxes' => $taxes,
+            //'warehouse' => 200,
         ];
     }
 
@@ -234,6 +250,10 @@ foreach ($ordersHistory as $change) {
 
         if (mb_substr($paymentDescription, 0, mb_strlen('siigo-')) != 'siigo-') {
             $logger->warning("- payment of order " . $order['id'] . " in CRM doesn't have Siigo payment id - skipping ...");
+            continue;
+        }
+
+        if (!isset($payment['paidAt'])) {
             continue;
         }
 
@@ -272,7 +292,8 @@ foreach ($ordersHistory as $change) {
         //'number' => 1000000000 + intval($order['id']),
         'date' => $createdAt ? $createdAt->format('Y-m-d') : $createdAt,
         'customer' => [
-            'identification' => $order['customer']['customFields'][$config['dni_custom_field']],
+            'identification' =>
+                str_replace([',', '.', '-', ' '], '', $order['customer']['customFields'][$config['dni_custom_field']]),
             //'branch_office' => 0,
         ],
         //'cost_center' => 235,
