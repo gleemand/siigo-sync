@@ -10,6 +10,8 @@ if ($custSinceId) {
     $logger->info("✓ load from sinceId " . $custSinceId);
 }
 
+$continueHistoryLoading = false;
+
 $customersHistory = [];
 
 try {
@@ -25,6 +27,10 @@ try {
         $response = $api->request->customersHistory($filter, $page, 100);
         foreach ($response['history'] as $history) {
 
+            if (isset($history['apiKey']['current']) && $history['apiKey']['current'] == true) {
+                continue;
+            }
+            
             $customersHistory[] = $history;
             $custSinceId = $history['id'];
         }
@@ -34,13 +40,18 @@ try {
             break;
         }
 
-        if ($page%5 == 0) {
+        if ($page%10 == 0) {
             sleep(2);
+        } else {
+            usleep(250000);
         }
     }
 
 } catch (\RetailCrm\Exception\CurlException $e) {
     $logger->error("Connection error: " . $e->getMessage());
+} catch (RetailCrm\Exception\LimitException $e) {
+    $logger->error("RetailCRM limit error: " . $e->getMessage() . ". Continue next time.");
+    $continueHistoryLoading = true;
 }
 
 $customers = assemblyCustomer($customersHistory);
@@ -201,5 +212,10 @@ foreach ($customers as $customer) {
 }
 
 file_put_contents($lastCustomerHistFile, $custSinceId);
+
+if ($continueHistoryLoading) {
+    $logger->info("✓✗ customers history loaded, but will continue next time");
+    die();
+}
 
 $logger->info("✓ customers history loaded from CRM");

@@ -27,6 +27,10 @@ try {
         $response = $api->request->ordersHistory($filter, $page, 100);
         foreach ($response['history'] as $history) {
 
+            if (isset($history['apiKey']['current']) && $history['apiKey']['current'] == true) {
+                continue;
+            }
+
             $ordersHistory[] = $history;
             $ordSinceId = $history['id'];
         }
@@ -36,13 +40,17 @@ try {
             break;
         }
 
-        if ($page%5 == 0) {
+        if ($page%10 == 0) {
             sleep(2);
+        } else {
+            usleep(250000);
         }
     }
 
 } catch (\RetailCrm\Exception\CurlException $e) {
     $logger->error("Connection error: " . $e->getMessage());
+} catch (RetailCrm\Exception\LimitException $e) {
+    $logger->error("RetailCRM limit error: " . $e->getMessage() . ". Continue next time.");
 }
 
 

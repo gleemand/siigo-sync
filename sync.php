@@ -8,7 +8,7 @@ require_once dirname(__FILE__) . '/vendor/autoload.php';
 require_once dirname(__FILE__) . '/config.php';
 require_once dirname(__FILE__) . '/functions.php';
 
-if (is_dir(dirname(__FILE__) . '/logs')) {
+if (!is_dir(dirname(__FILE__) . '/logs')) {
     mkdir(dirname(__FILE__) . '/logs');
 }
 
@@ -84,7 +84,7 @@ foreach ($sites as $site => $config) {
     include dirname(__FILE__) . '/auth.php';
 
     if ($loadIcml) {
-        if (is_dir(dirname(__FILE__) . '/icml')) {
+        if (!is_dir(dirname(__FILE__) . '/icml')) {
             mkdir(dirname(__FILE__) . '/icml');
         }
 
@@ -96,7 +96,7 @@ foreach ($sites as $site => $config) {
     }
 
     if ($loadCustomers) {
-        if (is_dir(dirname(__FILE__) . '/siigo')) {
+        if (!is_dir(dirname(__FILE__) . '/siigo')) {
             mkdir(dirname(__FILE__) . '/siigo');
         }
 
@@ -104,7 +104,7 @@ foreach ($sites as $site => $config) {
     }
 
     if ($loadOrders) {
-        if (is_dir(dirname(__FILE__) . '/siigo')) {
+        if (!is_dir(dirname(__FILE__) . '/siigo')) {
             mkdir(dirname(__FILE__) . '/siigo');
         }
 
@@ -112,7 +112,7 @@ foreach ($sites as $site => $config) {
     }
 
     if ($resetHist) {
-        if (is_dir(dirname(__FILE__) . '/siigo')) {
+        if (!is_dir(dirname(__FILE__) . '/siigo')) {
             mkdir(dirname(__FILE__) . '/siigo');
         }
 
@@ -121,12 +121,13 @@ foreach ($sites as $site => $config) {
 
         $nowOrders = new \DateTime('now', new DateTimeZone('America/Bogota'));
         $nowCustomers = new \DateTime('now', new DateTimeZone('UTC'));
+
         file_put_contents($siigoInvoicesUpdatedFile, $nowOrders->format('Y-m-d\TH:i:s.v\Z'));
         file_put_contents($siigoCustomersUpdatedFile, $nowCustomers->format('Y-m-d\TH:i:s.v\Z'));
     }
 
     if ($resetCrmHist) {
-        if (is_dir(dirname(__FILE__) . '/crm')) {
+        if (!is_dir(dirname(__FILE__) . '/crm')) {
             mkdir(dirname(__FILE__) . '/crm');
         }
 
@@ -134,7 +135,7 @@ foreach ($sites as $site => $config) {
     }
 
     if ($loadCrmCustomers) {
-        if (is_dir(dirname(__FILE__) . '/crm')) {
+        if (!is_dir(dirname(__FILE__) . '/crm')) {
             mkdir(dirname(__FILE__) . '/crm');
         }
 
@@ -142,7 +143,7 @@ foreach ($sites as $site => $config) {
     }
 
     if ($loadCrmOrders) {
-        if (is_dir(dirname(__FILE__) . '/crm')) {
+        if (!is_dir(dirname(__FILE__) . '/crm')) {
             mkdir(dirname(__FILE__) . '/crm');
         }
 
