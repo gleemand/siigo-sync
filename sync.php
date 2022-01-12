@@ -14,7 +14,7 @@ if (!is_dir(dirname(__FILE__) . '/logs')) {
 
 $logger = new Logger('Log');
 $handler = new RotatingFileHandler(__DIR__ . '/logs/log.log', 30,  Logger::DEBUG);
-$formatter = new LineFormatter(null, null, false, true);
+$formatter = new LineFormatter(null, 'd-M-Y H:i:s', false, true);
 $handler->setFormatter($formatter);
 $logger->pushHandler($handler);
 

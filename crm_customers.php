@@ -30,7 +30,7 @@ try {
             if (isset($history['apiKey']['current']) && $history['apiKey']['current'] == true) {
                 continue;
             }
-            
+
             $customersHistory[] = $history;
             $custSinceId = $history['id'];
         }
@@ -49,8 +49,11 @@ try {
 
 } catch (\RetailCrm\Exception\CurlException $e) {
     $logger->error("Connection error: " . $e->getMessage());
+
+    die();
 } catch (RetailCrm\Exception\LimitException $e) {
     $logger->error("RetailCRM limit error: " . $e->getMessage() . ". Continue next time.");
+
     $continueHistoryLoading = true;
 }
 
@@ -215,6 +218,7 @@ file_put_contents($lastCustomerHistFile, $custSinceId);
 
 if ($continueHistoryLoading) {
     $logger->info("✓✗ customers history loaded, but will continue next time");
+
     die();
 }
 

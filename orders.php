@@ -180,6 +180,7 @@ if ($siigoInvoices) {
 
             $offer = [];
             $offer['article'] = $item['code'];
+            $offer['externalId'] = $item['code'];
 
             $tax = null;
             if (isset($item['taxes']) && $item['taxes']) {
@@ -187,7 +188,7 @@ if ($siigoInvoices) {
             }
 
             $items[] = [
-                'externalId' => $i.'_'.$invoice['number'].'_'.$item['code'],
+                'id' => $i.'_'.$invoice['number'].'_'.$item['code'],
                 'initialPrice' => $initialPrice,
                 //'discountManualAmount' => $discountManualAmount,
                 //'discountManualPercent' => $discountManualPercent,
@@ -207,6 +208,7 @@ if ($siigoInvoices) {
         $createdAt = getDateFromStr($invoice['metadata']['created']);
 
         $payments = [];
+
         foreach ($invoice['payments'] as $pi => $payment) {
             if ($payment['value'] <= 0) {
                 continue;
@@ -236,7 +238,7 @@ if ($siigoInvoices) {
             && $contact['email']
             && preg_match($emailPattern, $contact['email'])
         ) {
-            $email = $contact['email'];
+            $email = strtolower($contact['email']);
         }
 
         $order = [
@@ -295,7 +297,6 @@ if ($siigoInvoices) {
                 } else {
                     $logger->error('✗ order update ' . 'error: [HTTP-code ' . $response->getStatusCode() . '] ' . $response->getErrorMsg());
                     $logger->error(json_encode($order));
-                    $logger->error(json_encode($response));
                     continue;
                 }
 
@@ -310,7 +311,6 @@ if ($siigoInvoices) {
                 } else {
                     $logger->error('✗ order create ' . 'error: [HTTP-code ' . $response->getStatusCode() . '] ' . $response->getErrorMsg());
                     $logger->error(json_encode($order));
-                    $logger->error(json_encode($response));
                     continue;
                 }
             }

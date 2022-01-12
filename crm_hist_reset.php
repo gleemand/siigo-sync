@@ -2,8 +2,8 @@
 
 $logger->info('- resetting CRM history');
 
-$lastCustomerHistFile = dirname(__FILE__) . '/crm/'.$site.'_last_customer_history';
-$lastOrderHistFile = dirname(__FILE__) . '/crm/'.$site.'_last_order_history';
+$lastCustomerHistFile = dirname(__FILE__) . '/crm/' . $site . '_last_customer_history';
+$lastOrderHistFile = dirname(__FILE__) . '/crm/' . $site . '_last_order_history';
 
 $custSinceId = null;
 $orderSinceId = null;

@@ -500,6 +500,13 @@ function prepareCustomerAddress(array $address) {
 
             return $result;
         }
+
+        // Set the default address when the city is not found
+        return [
+            'country_code' => 'Co',
+            'city_code' => '11001',
+            'state_code' => '11'
+        ];
     }
 
     return false;

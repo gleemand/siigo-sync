@@ -92,7 +92,7 @@ foreach ($products as $product) {
     }
 
     $offers[] = [
-        'article' => $product['code'],
+        'externalId' => $product['code'],
         'stores' => [[
             'code' => $storeCode,
             'available' => $product['available_quantity'] < 0 ? 0 : $product['available_quantity'],
@@ -108,7 +108,9 @@ foreach ($chunks as $chunk) {
     try {
 
         usleep(2000000);
+
         $response = $api->request->storeInventoriesUpload($chunk, $site);
+
         if (!$response->isSuccessful()) {
 
             $logger->error('✗ error: [HTTP-code ' . $response->getStatusCode() . '] ' . $response->getErrorMsg());

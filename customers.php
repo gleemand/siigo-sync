@@ -9,12 +9,14 @@ $siigoCustomers = [];
 
 $customerUpdated = null;
 $siigoCustomersUpdatedFile = dirname(__FILE__) . '/siigo/'.$site.'_last_customer_updated';
+
 if (file_exists($siigoCustomersUpdatedFile)) {
     $customerUpdated = file_get_contents($siigoCustomersUpdatedFile);
 }
 
 // created
 $url = 'https://api.siigo.com/v1/customers';
+
 if ($customerUpdated) {
 
     $url .= '?created_start=' . $customerUpdated;
@@ -173,7 +175,6 @@ if ($siigoCustomers) {
                 } else {
                     $logger->error('✗ customer update ' . 'error: [HTTP-code ' . $response->getStatusCode() . '] ' . $response->getErrorMsg());
                     $logger->error(json_encode($customer));
-                    $logger->error(json_encode($response));
                     continue;
                 }
 
@@ -181,13 +182,14 @@ if ($siigoCustomers) {
 
                 // create
                 usleep(1000000);
+
                 $response = $api->request->customersCreate($customer, $site);
+
                 if ($response->isSuccessful()) {
-                    echo "✓ customer ".$data['id']." was created in ".$site."\n";
+                    $logger->info('✓ customer ' . $data['id'] . ' was created in ' . $site);
                 } else {
                     $logger->error('✗ customer create ' . 'error: [HTTP-code ' . $response->getStatusCode() . '] ' . $response->getErrorMsg());
                     $logger->error(json_encode($customer));
-                    $logger->error(json_encode($response));
                     continue;
                 }
             }

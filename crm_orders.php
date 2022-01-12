@@ -49,8 +49,12 @@ try {
 
 } catch (\RetailCrm\Exception\CurlException $e) {
     $logger->error("Connection error: " . $e->getMessage());
+
+    die();
 } catch (RetailCrm\Exception\LimitException $e) {
-    $logger->error("RetailCRM limit error: " . $e->getMessage() . ". Continue next time.");
+    $logger->error("RetailCRM limit error: " . $e->getMessage());
+
+    die();
 }
 
 
@@ -150,6 +154,7 @@ foreach ($ordersHistory as $change) {
             if (
                 ($change['field'] != 'full_paid_at' || empty($change['newValue']))
                 && $change['field'] != 'custom_siigo_last_error'
+                && !isset($change['order']['fullPaidAt'])
             ) {
                 continue 2;
             }

@@ -116,7 +116,7 @@ function displayHtml($titleData, $data)
         }
 
         if ($titleData == 'Usuarios (users)') {
-            echo "<td>{$value['identification']}</td>";
+            echo "<td>{$value['email']}</td>";
             echo "<td>{$value['active']}</td>";
         } else {
             echo "<td>{$value['name']}</td>";
