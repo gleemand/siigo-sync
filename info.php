@@ -6,12 +6,9 @@ use Monolog\Formatter\LineFormatter;
 
 require_once dirname(__FILE__) . '/vendor/autoload.php';
 require_once dirname(__FILE__) . '/config.php';
+require_once dirname(__FILE__) . '/functions.php';
 
-$logger = new Logger('Log');
-$handler = new RotatingFileHandler(__DIR__ . '/logs/log.log', 30,  Logger::DEBUG);
-$formatter = new LineFormatter(null, null, false, true);
-$handler->setFormatter($formatter);
-$logger->pushHandler($handler);
+$logger = loggerBuild('INFO');
 
 $logger->info('----------------Display info----------------');
 
@@ -66,6 +63,11 @@ displayHtml('Usuarios (users)', $users['results']);
 $costs = getDataFromSiigo('https://api.siigo.com/v1/cost-centers');
 
 displayHtml('Centros de Costo (cost centers)', $costs);
+
+// FV Document types
+$doctypes = getDataFromSiigo('https://api.siigo.com/v1/document-types?type=FV');
+
+displayHtml('FV Document types', $doctypes);
 
 echo html('end');
 

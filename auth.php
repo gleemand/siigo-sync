@@ -1,5 +1,6 @@
 <?php
 
+$logger = loggerBuild('AUTH');
 $logger->info('- getting new auth token for ' . $site);
 
 

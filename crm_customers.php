@@ -1,5 +1,6 @@
 <?php
 
+$logger = loggerBuild('CRM_CUST');
 $logger->info("- load customer history from CRM");
 
 $lastCustomerHistFile = dirname(__FILE__) . '/crm/'.$site.'_last_customer_history';
@@ -62,7 +63,6 @@ $customers = assemblyCustomer($customersHistory);
 foreach ($customers as $customer) {
 
     if (!isset($customer['site']) || empty($customer['site'])) {
-        $logger->warning("- customer " . $customer['id'] . ": site is empty - skipping ...");
         continue;
     }
 
@@ -145,7 +145,7 @@ foreach ($customers as $customer) {
         'contacts' => [[
             'first_name' => isset($customer['firstName']) ? $customer['firstName'] : null,
             'last_name' => isset($customer['lastName']) ? $customer['lastName'] : null,
-            'email' => $customer['email'],
+            'email' => isset($customer['email']) ? $customer['email'] : null,
             'phone' => $phones ? current($phones) : null,
         ]],
         'comments' => 'RetailCRM customer ' . $customer['id'],
@@ -175,7 +175,7 @@ foreach ($customers as $customer) {
 
     // error
     if (isset($result['Errors'])) {
-        $logger->error('Customer: ' . $customer['email'] . ' - ' . $post['identification']);
+        $logger->error('Customer: ' . $customer['id'] . ' - ' . $post['identification']);
 
         $errors = [];
         foreach ($result['Errors'] as $error) {

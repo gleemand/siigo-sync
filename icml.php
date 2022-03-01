@@ -1,5 +1,6 @@
 <?php
 
+$logger = loggerBuild('ICML');
 $logger->info('- loading products from ' . $site);
 
 // groups --------------------------------------------------------------------------------------------------------------
@@ -38,8 +39,10 @@ do {
         die();
     }
 
-    foreach ($result['results'] as $item) {
-        $products[$item['code']] = $item;
+    if (isset($result['results'])) {
+        foreach ($result['results'] as $item) {
+            $products[$item['code']] = $item;
+        }
     }
 
     $url = isset($result['_links']['next']['href']) ? $result['_links']['next']['href'] : null;
@@ -105,7 +108,7 @@ foreach ($products as $item) {
     //$offer->setAttribute("productId", $item['id']);
     $offer->setAttribute("id", $item['code']);
     $offer->setAttribute("productId", $item['code']);
-    $offer->setAttribute("quantity", $item['available_quantity']);
+    $offer->setAttribute("quantity", $item['available_quantity'] < 0 ? 0 : $item['available_quantity']);
 
     //$offer->appendChild($icml->createElement('url', 'https://'));
 
@@ -148,6 +151,29 @@ foreach ($products as $item) {
         $param->setAttribute("name", 'Reference');
         $param->setAttribute("code", 'reference');
         $offer->appendChild($param);
+    }
+
+    if (isset($item['code']) && $item['code']) {
+        $param = $icml->createElement('param', $item['code']);
+        $param->setAttribute("name", 'Article');
+        $param->setAttribute("code", 'article');
+        $offer->appendChild($param);
+    }
+
+    if (isset($item['description']) && $item['description']) {
+        $param = $icml->createElement('param', $item['description']);
+        $param->setAttribute("name", 'Description');
+        $param->setAttribute("code", 'description');
+        $offer->appendChild($param);
+    }
+
+    if (isset($item['additional_fields']) && $item['additional_fields']) {
+        foreach ($item['additional_fields'] as $key => $value) {
+            $param = $icml->createElement('param', $value);
+            $param->setAttribute("name", $key);
+            $param->setAttribute("code", $key);
+            $offer->appendChild($param);
+        }
     }
 
     $offers->appendChild($offer);

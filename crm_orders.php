@@ -1,5 +1,6 @@
 <?php
 
+$logger = loggerBuild('CRM_ORD');
 $logger->info("- load order history from CRM");
 
 $lastOrderHistFile = dirname(__FILE__) . '/crm/' . $site . '_last_order_history';
@@ -182,7 +183,7 @@ foreach ($ordersHistory as $change) {
         continue;
     }
 
-    $siigoTypesOfDoc = current($siigoTypesOfDocs);
+    $siigoTypesOfDoc = end($siigoTypesOfDocs);
 
     // checks
     if (

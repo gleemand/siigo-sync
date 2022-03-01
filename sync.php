@@ -12,11 +12,7 @@ if (!is_dir(dirname(__FILE__) . '/logs')) {
     mkdir(dirname(__FILE__) . '/logs');
 }
 
-$logger = new Logger('Log');
-$handler = new RotatingFileHandler(__DIR__ . '/logs/log.log', 30,  Logger::DEBUG);
-$formatter = new LineFormatter(null, 'd-M-Y H:i:s', false, true);
-$handler->setFormatter($formatter);
-$logger->pushHandler($handler);
+$logger = loggerBuild('SYNC');
 
 $logger->info('--------------------------------------------------------');
 
@@ -150,5 +146,6 @@ foreach ($sites as $site => $config) {
         include dirname(__FILE__) . '/crm_orders.php';
     }
 
+    $logger = loggerBuild('SYNC');
     $logger->info("Sync for " . $site . " is DONE");
 }

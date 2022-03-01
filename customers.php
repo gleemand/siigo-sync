@@ -1,5 +1,6 @@
 <?php
 
+$logger = loggerBuild('SIIGO_CUST');
 $logger->info('- loading customers for ' . $site);
 
 $now = new \DateTime('now', new DateTimeZone('UTC'));

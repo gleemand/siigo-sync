@@ -1,5 +1,9 @@
 <?php
 
+use Monolog\Logger;
+use Monolog\Handler\RotatingFileHandler;
+use Monolog\Formatter\LineFormatter;
+
 $fields = [
     'customer' => [
         'id' => 'id',
@@ -569,4 +573,15 @@ function getCityNameByCode($cityCode)
     }
 
     return $cityName;
+}
+
+function loggerBuild($name)
+{
+    $logger = new Logger($name);
+    $handler = new RotatingFileHandler(__DIR__ . '/logs/log.log', 15,  Logger::DEBUG);
+    $formatter = new LineFormatter(null, 'd-M-Y H:i:s', false, true);
+    $handler->setFormatter($formatter);
+    $logger->pushHandler($handler);
+
+    return $logger;
 }

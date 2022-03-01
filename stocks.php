@@ -1,5 +1,6 @@
 <?php
 
+$logger = loggerBuild('STOCK');
 $logger->info('- loading stocks for ' . $site);
 
 

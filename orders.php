@@ -1,5 +1,6 @@
 <?php
 
+$logger = loggerBuild('SIIGO_ORD');
 $logger->info('- loading orders for ' . $site);
 
 $now = new \DateTime('now', new DateTimeZone('America/Bogota'));

@@ -1,5 +1,6 @@
 <?php
 
+$logger = loggerBuild('CRM_HIST');
 $logger->info('- resetting CRM history');
 
 $lastCustomerHistFile = dirname(__FILE__) . '/crm/' . $site . '_last_customer_history';
