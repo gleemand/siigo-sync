@@ -45,6 +45,7 @@ if (isset($result['access_token']) && !empty($result['access_token'])) {
 $headers = [
     'Accept' => 'application/json',
     'Content-Type' => 'application/json',
-    'Authorization' => 'Bearer '.$accessToken,
+    'Authorization' => 'Bearer ' . $accessToken,
 ];
 
+//var_dump($headers);

@@ -195,7 +195,7 @@ foreach ($ordersHistory as $change) {
         $upd = [
             'id' => $order['id'],
             'customFields' => [
-                'siigo_last_error' => "The customer doesn't have identification",
+                'siigo_last_error' => "The customer doesn't have identification (cedula)",
             ],
         ];
         $response = $api->request->ordersEdit($upd, 'id', $order['site']);

@@ -1,9 +1,5 @@
 <?php
 
-use Monolog\Logger;
-use Monolog\Handler\RotatingFileHandler;
-use Monolog\Formatter\LineFormatter;
-
 require_once dirname(__FILE__) . '/vendor/autoload.php';
 require_once dirname(__FILE__) . '/config.php';
 require_once dirname(__FILE__) . '/functions.php';
@@ -14,25 +10,40 @@ if (!is_dir(dirname(__FILE__) . '/logs')) {
 
 $logger = loggerBuild('SYNC');
 
+// lock file
+$lockName = dirname(__FILE__) . '/sync.lock';
+$fp = fopen($lockName, "w+");
+
+if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $logger->error('----> Trying to run the script, but it is already running');
+    fclose($fp);
+
+    die();
+}
+
 $logger->info('--------------------------------------------------------');
 
 // arguments
 $loadIcml = $loadStocks = $loadCustomers = $loadOrders = $resetHist = false;
 $resetCrmHist = $loadCrmCustomers = $loadCrmOrders = false;
-foreach ($argv as $arg) {
 
+foreach ($argv as $arg) {
     if ($arg == 'icml') {
         $loadIcml = true;
     }
+
     if ($arg == 'stocks') {
         $loadStocks = true;
     }
+
     if ($arg == 'customers') {
         $loadCustomers = true;
     }
+
     if ($arg == 'orders') {
         $loadOrders = true;
     }
+
     if ($arg == 'hist_reset') {
         $resetHist = true;
     }
@@ -40,9 +51,11 @@ foreach ($argv as $arg) {
     if ($arg == 'crm_hist_reset') {
         $resetCrmHist = true;
     }
+
     if ($arg == 'crm_customers') {
         $loadCrmCustomers = true;
     }
+
     if ($arg == 'crm_orders') {
         $loadCrmOrders = true;
     }
@@ -50,11 +63,13 @@ foreach ($argv as $arg) {
 
 // choose accounts to load from args
 $loadAccounts = [];
+
 foreach ($argv as $arg) {
     if (array_key_exists($arg, $sites)) {
         $loadAccounts[] = $arg;
     }
 }
+
 if (empty($loadAccounts)) {
     $loadAccounts = array_keys($sites);
 }
@@ -146,6 +161,9 @@ foreach ($sites as $site => $config) {
         include dirname(__FILE__) . '/crm_orders.php';
     }
 
-    $logger = loggerBuild('SYNC');
     $logger->info("Sync for " . $site . " is DONE");
 }
+
+flock($fp, LOCK_UN);
+fclose($fp);
+unlink($lockName);
