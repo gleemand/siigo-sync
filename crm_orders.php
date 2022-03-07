@@ -186,8 +186,6 @@ foreach ($ordersHistory as $change) {
         !isset($order['customer']['customFields'][$config['dni_custom_field']])
         || empty($order['customer']['customFields'][$config['dni_custom_field']])
     ) {
-        $logger->warning("- customer of order " . $order['id'] . " doesn't have identification - skipping ...");
-
         $upd = [
             'id' => $order['id'],
             'customFields' => [

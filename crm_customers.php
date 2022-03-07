@@ -81,8 +81,6 @@ foreach ($customers as $customer) {
         !isset($customer['customFields'][$config['dni_custom_field']])
         || empty($customer['customFields'][$config['dni_custom_field']])
     ) {
-        $logger->warning("- customer " . $customer['id'] . " doesn't have identification - skipping ...");
-
         $upd = [
             'id' => $customer['id'],
             'customFields' => [
