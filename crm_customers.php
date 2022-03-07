@@ -14,48 +14,42 @@ if ($custSinceId) {
 $continueHistoryLoading = false;
 
 $customersHistory = [];
+$page = 1;
+$filter = [];
 
-try {
+if ($custSinceId) {
+    $filter['sinceId'] = $custSinceId;
+}
 
-    $page = 1;
-    $filter = [];
-    if ($custSinceId) {
-        $filter['sinceId'] = $custSinceId;
+while (true) {
+    $response = sendSimlaApiRequest($api, 'customersHistory', $filter, $page, 100);
+
+    foreach ($response['history'] as $history) {
+        if (isset($history['apiKey']['current']) && $history['apiKey']['current'] == true) {
+            continue;
+        }
+
+        $customersHistory[] = $history;
+        $custSinceId = $history['id'];
     }
 
-    while (true) {
+    ++$page;
 
-        $response = $api->request->customersHistory($filter, $page, 100);
-        foreach ($response['history'] as $history) {
-
-            if (isset($history['apiKey']['current']) && $history['apiKey']['current'] == true) {
-                continue;
-            }
-
-            $customersHistory[] = $history;
-            $custSinceId = $history['id'];
-        }
-
-        ++$page;
-        if ($page > $response['pagination']['totalPageCount']) {
-            break;
-        }
-
-        if ($page%10 == 0) {
-            sleep(2);
-        } else {
-            usleep(250000);
-        }
+    if (
+        $page > $response['pagination']['totalPageCount']
+    ) {
+        break;
     }
 
-} catch (\RetailCrm\Exception\CurlException $e) {
-    $logger->error("Connection error: " . $e->getMessage());
+    if ($page%100 == 0) {
+        $logger->info("✓ loaded page " . $page . ' of '. $response['pagination']['totalPageCount']);
+    }
 
-    die();
-} catch (RetailCrm\Exception\LimitException $e) {
-    $logger->error("RetailCRM limit error: " . $e->getMessage() . ". Continue next time.");
-
-    $continueHistoryLoading = true;
+    if ($page%10 == 0) {
+        sleep(1);
+    } else {
+        usleep(200000);
+    }
 }
 
 $customers = assemblyCustomer($customersHistory);
@@ -66,9 +60,10 @@ foreach ($customers as $customer) {
         continue;
     }
 
-    usleep(500000);
+    usleep(200000);
     // get full and up to date customer
-    $response = $api->request->customersGet($customer['id'], 'id', $customer['site']);
+    $response = sendSimlaApiRequest($api, 'customersGet', $customer['id'], 'id', $customer['site']);
+
     if ($response->isSuccessful() && $response['customer']) {
         $customer = $response['customer'];
     } else {
@@ -94,7 +89,8 @@ foreach ($customers as $customer) {
                 'siigo_last_error' => "The customer doesn't have identification",
             ],
         ];
-        $response = $api->request->customersEdit($upd, 'id', $customer['site']);
+
+        $response = sendSimlaApiRequest($api, 'customersEdit', $upd, 'id', $customer['site']);
 
         continue;
     }
@@ -190,7 +186,8 @@ foreach ($customers as $customer) {
                 'siigo_last_error' => implode("\n", $errors),
             ],
         ];
-        $response = $api->request->customersEdit($upd, 'id', $customer['site']);
+
+        $response = sendSimlaApiRequest($api, 'customersEdit', $upd, 'id', $customer['site']);
 
         continue;
     }
@@ -207,7 +204,8 @@ foreach ($customers as $customer) {
                     'siigo_id' => $result['id'],
                 ],
             ];
-            $response = $api->request->customersEdit($upd, 'id', $customer['site']);
+
+            $response = sendSimlaApiRequest($api, 'customersEdit', $upd, 'id', $customer['site']);
         } else {
             $logger->info("✓ customer " . $customer['id'] . " was updated in Siigo");
         }
@@ -215,11 +213,5 @@ foreach ($customers as $customer) {
 }
 
 file_put_contents($lastCustomerHistFile, $custSinceId);
-
-if ($continueHistoryLoading) {
-    $logger->info("✓✗ customers history loaded, but will continue next time");
-
-    die();
-}
 
 $logger->info("✓ customers history loaded from CRM");

@@ -575,6 +575,31 @@ function getCityNameByCode($cityCode)
     return $cityName;
 }
 
+function sendSimlaApiRequest($api, $request, ...$args)
+{
+    $attempts = 0;
+
+    do {
+        if ($attempts > 5) {
+            die();
+        }
+
+        try {
+            $response = $api->request->$request(...$args);
+        } catch (\Exception $e) {
+            $logger->error("RetailCRM connection error: " . $e->getMessage() . ". Retry...");
+            $attempts++;
+            sleep(1);
+
+            continue;
+        }
+
+        break;
+    } while(true);
+
+    return $response;
+}
+
 function loggerBuild($name)
 {
     $logger = new Logger($name);

@@ -14,50 +14,44 @@ if ($ordSinceId) {
 }
 
 $ordersHistory = [];
+$page = 1;
+$filter = [];
 
-try {
-
-    $page = 1;
-    $filter = [];
-    if ($ordSinceId) {
-        $filter['sinceId'] = $ordSinceId;
-    }
-
-    while (true) {
-
-        $response = $api->request->ordersHistory($filter, $page, 100);
-        foreach ($response['history'] as $history) {
-
-            if (isset($history['apiKey']['current']) && $history['apiKey']['current'] == true) {
-                continue;
-            }
-
-            $ordersHistory[] = $history;
-            $ordSinceId = $history['id'];
-        }
-
-        ++$page;
-        if ($page > $response['pagination']['totalPageCount']) {
-            break;
-        }
-
-        if ($page%10 == 0) {
-            sleep(2);
-        } else {
-            usleep(250000);
-        }
-    }
-
-} catch (\RetailCrm\Exception\CurlException $e) {
-    $logger->error("Connection error: " . $e->getMessage());
-
-    die();
-} catch (RetailCrm\Exception\LimitException $e) {
-    $logger->error("RetailCRM limit error: " . $e->getMessage());
-
-    die();
+if ($ordSinceId) {
+    $filter['sinceId'] = $ordSinceId;
 }
 
+while (true) {
+    $response = sendSimlaApiRequest($api, 'ordersHistory', $filter, $page, 100);
+
+    foreach ($response['history'] as $history) {
+        if (isset($history['apiKey']['current']) && $history['apiKey']['current'] == 1) {
+            continue;
+        }
+
+        $ordersHistory[] = $history;
+        $ordSinceId = $history['id'];
+    }
+
+    ++$page;
+
+    if (
+        $page > $response['pagination']['totalPageCount']
+        || $page > 1000
+    ) {
+        break;
+    }
+
+    if ($page%100 == 0) {
+        $logger->info("✓ loaded page " . $page . ' of '. $response['pagination']['totalPageCount']);
+    }
+
+    if ($page%10 == 0) {
+        sleep(1);
+    } else {
+        usleep(200000);
+    }
+}
 
 // Siigo: types of document --------------------------------------------------------------------------------------------
 $siigoTypesOfDocs = [];
@@ -67,12 +61,13 @@ try {
     $result = json_decode($response->getBody()->getContents(), true);
 } catch (\Exception $e) {
     $logger->error('✗ ' . $e->getMessage());
+
     die();
 }
 
 if (isset($result['Errors'])) {
-
     $errors = [];
+
     foreach ($result['Errors'] as $error) {
         $errors[] = $error['Message'] . " (" . $error['Code'] . ")";
         $logger->error(json_encode($error));
@@ -93,11 +88,12 @@ $siigoTaxes = [];
 try {
     $response = $client->request('GET', 'https://api.siigo.com/v1/taxes', ['headers' => $headers]);
     $result = json_decode($response->getBody()->getContents(), true);
-
 } catch (\Exception $e) {
     $logger->error('✗ ' . $e->getMessage());
+
     die();
 }
+
 foreach ($result as $item) {
     $siigoTaxes[$item['id']] = $item;
 }
@@ -120,11 +116,10 @@ function findTaxId($percentage) {
 //foreach ($orders as $order) {
 
 // get orders statuses and payment types from CRM
-$crmStatuses = $api->request->statusesList();
-$crmPayments = $api->request->paymentTypesList();
+//$crmStatuses = sendSimlaApiRequest($api, 'statusesList');
+$crmPayments = sendSimlaApiRequest($api, 'paymentTypesList');
 
 foreach ($ordersHistory as $change) {
-
     switch ($config['trigger']) {
         case 'status':
             if ((
@@ -168,9 +163,10 @@ foreach ($ordersHistory as $change) {
         continue;
     }
 
-    usleep(500000);
+    usleep(200000);
     // get full and up to date order
-    $response = $api->request->ordersGet($change['order']['id'], 'id', $change['order']['site']);
+    $response = sendSimlaApiRequest($api, 'ordersGet', $change['order']['id'], 'id', $change['order']['site']);
+
     if ($response->isSuccessful() && $response['order']) {
         $order = $response['order'];
     } else {
@@ -198,7 +194,8 @@ foreach ($ordersHistory as $change) {
                 'siigo_last_error' => "The customer doesn't have identification (cedula)",
             ],
         ];
-        $response = $api->request->ordersEdit($upd, 'id', $order['site']);
+
+        $response = sendSimlaApiRequest($api, 'ordersEdit', $upd, 'id', $order['site']);
 
         continue;
     }
@@ -350,7 +347,8 @@ foreach ($ordersHistory as $change) {
                 'siigo_last_error' => implode("\n", $errors),
             ],
         ];
-        $response = $api->request->ordersEdit($upd, 'id', $order['site']);
+
+        $response = sendSimlaApiRequest($api, 'ordersEdit', $upd, 'id', $order['site']);
 
         continue;
     }
@@ -368,7 +366,8 @@ foreach ($ordersHistory as $change) {
                     'siigo_last_error' => '',
                 ],
             ];
-            $response = $api->request->ordersEdit($upd, 'id', $order['site']);
+
+            $response = sendSimlaApiRequest($api, 'ordersEdit', $upd, 'id', $order['site']);
         } else {
             $logger->info("✓ order " . $order['id'] . " was updated in Siigo");
         }
