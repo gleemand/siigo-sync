@@ -223,9 +223,46 @@ foreach ($ordersHistory as $change) {
             $retentions = array_merge($retentions, $taxes);
         }
 
+        $productArticle = $item['offer']['article'];
+        $productName = $item['offer']['name'];
+
+        if ($config['auto_create_product']['account_group']) {
+            try {
+                $response = $client->request('GET', 'https://api.siigo.com/v1/products?code=' . $productArticle, [
+                    'headers' => $headers,
+                ]);
+                $result = json_decode($response->getBody()->getContents(), true);
+
+                if (
+                    isset($result['pagination']['total_results'])
+                    && $result['pagination']['total_results'] == 0
+                ) {
+                    $logger->info('- creating product in Siigo for order #' . $order['id'] . '...');
+
+                    $response = $client->request('POST', 'https://api.siigo.com/v1/products', [
+                        'headers' => $headers,
+                        'json' => [
+                            'code' => $productArticle,
+                            'name' => $productName,
+                            'account_group' => $config['auto_create_product']['account_group'],
+                            'type' => 'Product',
+                            'stock_control' => true
+                        ]
+                    ]);
+                }
+
+                usleep(200000);
+            } catch (\Exception $e) {
+                $itemError = true;
+                $logger->error('✗ ' . $e->getMessage());
+
+                continue;
+            }
+        }
+
         $items[] = [
-            'code' => $item['offer']['article'],
-            'description' => $item['offer']['name'],
+            'code' => $productArticle,
+            'description' => $productName,
             'quantity' => $item['quantity'],
             'price' => $price,
             //'discount' => '', // in percent
@@ -234,8 +271,14 @@ foreach ($ordersHistory as $change) {
         ];
     }
 
+    if ($itemError) {
+        $logger->error("- error creating product in Siigo for order #" . $order['id']);
+
+        continue;
+    }
+
     // delivery as item
-    if ($config['delivery_item_code'] !== '') {
+    if ($config['delivery_item_code'] !== '' && isset($order['delivery']['cost']) && $order['delivery']['cost']) {
         $items[] = [
             'code' => $config['delivery_item_code'],
             'description' => isset($order['delivery']['code']) ? 'Delivery (' . $order['delivery']['code'] . ')' : 'Delivery',

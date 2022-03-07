@@ -43,6 +43,11 @@ $sites = [
                 '',
             ],
 
+        //auto create product in siigo if it doesnt exists
+        'auto_create_product' => [
+            'account_group' => '',
+        ],
+
         //code of delivery item in Siigo (delivery will deduct if empty)
         'delivery_item_code' => '',
 
