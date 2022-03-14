@@ -105,9 +105,9 @@ foreach ($customers as $customer) {
     }
 
     $address = [
-        'city' => isset($customer['address']['city']) ? $customer['address']['city'] : null,
-        'region' => isset($customer['address']['region']) ? $customer['address']['region'] : null,
-        'countryCode' => isset($customer['address']['countryIso']) ? $customer['address']['countryIso'] : null,
+        'city' => $customer['address']['city'] ?? null,
+        'region' => $customer['address']['region'] ?? null,
+        'countryCode' => $customer['address']['countryIso'] ?? null,
     ];
 
     $addressCodes = prepareCustomerAddress($address);
@@ -131,15 +131,15 @@ foreach ($customers as $customer) {
             'code' => 'R-99-PN',
         ]],
         'address' => [
-            'address' => isset($customer['address']['text']) ? $customer['address']['text'] : null,
+            'address' => $customer['address']['text'] ?? null,
             'city' => $addressCodes,
             "postal_code" => isset($customer['address']['index']) ? substr($customer['address']['index'], 0, 10) : null,
         ],
         'phones' => $phones,
         'contacts' => [[
-            'first_name' => isset($customer['firstName']) ? $customer['firstName'] : null,
-            'last_name' => isset($customer['lastName']) ? $customer['lastName'] : null,
-            'email' => isset($customer['email']) ? $customer['email'] : null,
+            'first_name' => $customer['firstName'] ?? null,
+            'last_name' => $customer['lastName'] ?? null,
+            'email' => $customer['email'] ?? null,
             'phone' => $phones ? current($phones) : null,
         ]],
         'comments' => 'RetailCRM customer ' . $customer['id'],
