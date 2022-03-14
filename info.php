@@ -64,6 +64,11 @@ $costs = getDataFromSiigo('https://api.siigo.com/v1/cost-centers');
 
 displayHtml('Centros de Costo (cost centers)', $costs);
 
+// Grupos de Inventario
+$inventario = getDataFromSiigo('https://api.siigo.com/v1/account-groups');
+
+displayHtml('Grupos de Inventario (account groups)', $inventario);
+
 // FV Document types
 $doctypes = getDataFromSiigo('https://api.siigo.com/v1/document-types?type=FV');
 
