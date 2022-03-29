@@ -198,11 +198,12 @@ foreach ($ordersHistory as $change) {
         continue;
     }
 
-    //$createdAt = getDateFromStr($order['fullPaidAt'], 'America/Bogota');
-    $createdAt = getDateFromStr($order['createdAt'], 'America/Bogota');
+    $createdAt = isset($order['fullPaidAt']) ? getDateFromStr($order['fullPaidAt']) : null;
+    //$createdAt = getDateFromStr($order['createdAt'], 'America/Bogota');
 
     $items = [];
     $retentions = [];
+    $itemError = false;
 
     foreach ($order['items'] as $item) {
         if (!isset($item['offer']['article']) || empty($item['offer']['article'])) {

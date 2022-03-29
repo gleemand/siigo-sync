@@ -587,6 +587,7 @@ function sendSimlaApiRequest($api, $request, ...$args)
         try {
             $response = $api->request->$request(...$args);
         } catch (\Exception $e) {
+            $logger = loggerBuild('ERROR');
             $logger->error("RetailCRM connection error: " . $e->getMessage() . ". Retry...");
             $attempts++;
             sleep(1);
