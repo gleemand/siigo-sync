@@ -9,7 +9,7 @@ if (file_exists($lastOrderHistFile)) {
     $ordSinceId = file_get_contents($lastOrderHistFile);
 }
 
-if ($ordSinceId) {
+if (isset($ordSinceId) and $ordSinceId) {
     $logger->info("✓ load from sinceId " . $ordSinceId);
 }
 
@@ -17,7 +17,7 @@ $ordersHistory = [];
 $page = 1;
 $filter = [];
 
-if ($ordSinceId) {
+if (isset($ordSinceId) and $ordSinceId) {
     $filter['sinceId'] = $ordSinceId;
 }
 

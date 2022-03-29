@@ -4,10 +4,12 @@ $logger = loggerBuild('CRM_CUST');
 $logger->info("- load customer history from CRM");
 
 $lastCustomerHistFile = dirname(__FILE__) . '/crm/'.$site.'_last_customer_history';
+
 if (file_exists($lastCustomerHistFile)) {
     $custSinceId = file_get_contents($lastCustomerHistFile);
 }
-if ($custSinceId) {
+
+if (isset($custSinceId) and $custSinceId) {
     $logger->info("✓ load from sinceId " . $custSinceId);
 }
 
@@ -17,7 +19,7 @@ $customersHistory = [];
 $page = 1;
 $filter = [];
 
-if ($custSinceId) {
+if (isset($custSinceId) and $custSinceId) {
     $filter['sinceId'] = $custSinceId;
 }
 
